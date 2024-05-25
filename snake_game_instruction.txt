@@ -1,0 +1,184 @@
+კოდი წარმოადგენს კლასიკური „გველის“ თამაშის მარტივ იმპლემენტაციას Pygame ბიბლიოთეკის გამოყენებით. ქვემოთ არის თითოეული კოდის ნაწილის საფუძვლიანი განმარტება ქართულ ენაზე:
+
+### ბიბლიოთეკების იმპორტი
+import pygame
+import random
+import time
+
+ეს ხაზები იმპორტირებას ახდენს საჭირო ბიბლიოთეკებს. `pygame` გამოიყენება თამაშის შესაქმნელად, `random` საჭმლის შემთხვევითი პოზიციების გენერაციისთვის, ხოლო `time` გამოიყენება დროის შეფერხებების დასამატებლად.
+
+### Pygame-ის ინიციალიზაცია
+pygame.init()
+ეს აინიციალიზებს ყველა საჭირო Pygame მოდულს თამაშისთვის.
+
+
+### თამაშის მუსიკა
+sound = pygame.mixer.music.load('8bit-music-for-game-68698.mp3')
+pygame.mixer.music.play(-1)
+ეს კოდი ტვირთავს და უკრავს ფონურ მუსიკას თამაშისათვის. არგუმენტი `-1` გულისხმობს, რომ მუსიკა უსასრულოდ განმეორდება.
+
+
+### ფერების განსაზღვრა
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = pygame.color.Color("green")
+ეს ხაზები განსაზღვრავს რამდენიმე ფერს RGB (წითელი, მწვანე, ლურჯი) მნიშვნელობებით. ეს ფერები გამოიყენება თამაშის სხვადასხვა ელემენტების დასახატავად.
+
+
+### ეკრანის ზომები
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+ეს ცვლადები განსაზღვრავს ეკრანის ზომებს.
+
+
+### ეკრანის ინიციალიზაცია
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("snake game , creator: ")
+ეს ქმნის თამაშის ფანჯარას მითითებული ზომებით და აყენებს სათაურს.
+
+
+### გველის სისწრაფე და კუბის ზომა
+snake_speed = 15
+snake_block = 10
+ეს ცვლადები განსაზღვრავს გველის სისწრაფეს და მისი სხეულის თითოეული კუბის ზომას.
+
+
+### გველის საწყისი პოზიცია
+x1 = SCREEN_WIDTH / 2
+y1 = SCREEN_HEIGHT / 2
+ეს კოდი აყენებს გველის საწყის პოზიციას ეკრანის ცენტრში.
+
+
+### გველის პოზიციის ცვლილება
+x1_change = 0
+y1_change = 0
+ეს ცვლადები დაიცავს გველის პოზიციის ცვლილებებს მომხმარებლის შეყვანის საფუძველზე.
+
+
+### ქულების ინიციალიზაცია
+score = 0
+ეს ცვლადი აყენებს ქულას ნულზე თამაშის დასაწყისში.
+
+
+### საჭმლის პარამეტრები
+food_width = 10
+food_height = 10
+foodx = random.randint(0, 795)
+foody = random.randint(0, 595)
+food_constructor = pygame.rect.Rect(foodx, foody, food_width, food_height)
+ეს ხაზები აყენებს საჭმლის საწყის პოზიციას და ზომას. `random.randint` ფუნქცია უზრუნველყოფს, რომ საჭმელი გამოჩნდეს ეკრანის შემთხვევით მდებარეობაში.
+
+
+### გველის სხეული და საათი
+snake_body = []
+clock = pygame.time.Clock()
+(snake_body) არის სია, რომელიც შეიცავს გველის სხეულის ყველა ბლოკის პოზიციებს. `clock` გამოიყენება თამაშის კადრების სიხშირის კონტროლისთვის.
+
+
+### ფუნქცია გველის ბლოკის დასამატებლად
+def snake_block_add(x, y):
+    snake_body.append((x, y))
+snake_block_add(x1, y1)
+ეს ფუნქცია ამატებს ბლოკს გველის სხეულს მითითებულ კოორდინატებზე. ის თავდაპირველად გამოიძახება საწყისი ბლოკის დასამატებლად.
+
+
+### თამაში დასრულების ფუნქცია
+def game_over():
+    game_close = True
+    while game_close:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        
+        screen.fill(BLACK)
+        font_style = pygame.font.SysFont(None, 50)
+        message = font_style.render("Game Over! Do you want to play again?", True, RED)
+        screen.blit(message, [SCREEN_WIDTH / 6, SCREEN_HEIGHT / 3])
+    
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+                if event.key == pygame.K_c:
+                    game_loop()
+ეს ფუნქცია აჩვენებს თამაშის დასრულების შეტყობინებას და ელოდება მომხმარებელს, რომ ან დახუროს თამაში (`q`) ან განაახლოს ის (`c`).
+
+
+### ძირითადი თამაშის ციკლი
+def game_loop():
+    global x1, y1, x1_change, y1_change, snake_block, snake_speed, score
+
+    game_over = False
+    
+    foodx = int(random.randint(0, SCREEN_WIDTH - snake_block) / 10.0) * 10.0
+    foody = int(random.randint(0, SCREEN_HEIGHT - snake_block) / 10.0) * 10.0
+    data_text_font = pygame.font.SysFont('verdana', 30)
+
+    while not game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+                
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x1_change = -snake_block
+                    y1_change = 0
+                elif event.key == pygame.K_RIGHT:
+                    x1_change = snake_block
+                    y1_change = 0
+                elif event.key == pygame.K_UP:
+                    y1_change = -snake_block
+                    x1_change = 0
+                elif event.key == pygame.K_DOWN:
+                    y1_change = snake_block
+                    x1_change = 0
+        
+        x1 += x1_change
+        y1 += y1_change
+
+        screen.fill(BLACK)
+        
+        pygame.draw.rect(screen, RED, [foodx, foody, snake_block, snake_block])
+
+        if x1 == foodx and y1 == foody:
+            foodx = random.randint(0, (SCREEN_WIDTH - snake_block) // 10) * 10
+            foody = random.randint(0, (SCREEN_HEIGHT - snake_block) // 10) * 10
+            snake_speed += 1
+            snake_body.append([x1, y1])
+            score += 1
+            if score == 3:
+                screen.fill(GREEN)
+                vin_text = data_text_font.render("YOU WIN", True, BLACK)
+                screen.blit(vin_text, (200, 100))
+                game_over = True
+                time.sleep(5)
+
+        for i in range(len(snake_body) - 1, 0, -1):
+            snake_body[i] = snake_body[i - 1]
+        snake_body[0] = [x1, y1]
+
+        for block in snake_body:
+            pygame.draw.rect(screen, snake_color, [block[0], block[1], snake_block, snake_block])
+
+        pygame.display.update()
+        
+        clock.tick(snake_speed)
+
+        if x1 >= SCREEN_WIDTH or x1 < 0 or y1 >= SCREEN_HEIGHT or y1 < 0:
+            game_over()
+ეს არის ძირითადი ფუნქცია, რომელიც მართავს თამაშს. მისი დეტალური განხილვა:
+- ინიციალიზაცია: ანახლებს გველის პოზიციას და გენერირებს საწყის საჭმლის პოზიციას.
+- მოვლენის დამუშავება: ამოწმებს მომხმარებლის შეყვანას გველის მოძრაობისთვის ან თამაშის დახურვისთვის.
+- მოძრაობა: ანახლებს გველის პოზიციას ამჟამინდელი მიმართულების მიხედვით.
+- ხატვა: ასუფთავებს ეკრანს და ხატავს საჭმელს და გველს.
+- კოლიზიის შემოწმება: ამოწმებს, შეჭამა თუ არა გველმა საჭმელი ან დაეჯახა კედელს.
+- გამარჯვების პირობა: ასრულებს თამაშს, თუ მოთამაშე მიაღწევს 3 ქულას და აჩვენებს გამარჯვების შეტყობინებას.
+
+### თამაშის დაწყება
+game_loop()
+ეს გამოიძახებს `game_loop` ფუნქციას თამაშის დასაწყებად.
